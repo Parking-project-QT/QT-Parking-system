@@ -4,7 +4,7 @@ QT_MAKE ?= $(QT_BIN)/mingw32-make.exe
 
 export PATH := $(QT_BIN);$(PATH)
 
-.PHONY: all firmware qt flash clean
+.PHONY: all firmware qt flash run clean
 
 all: firmware qt
 
@@ -23,6 +23,10 @@ qt-control/build/Makefile: qt-control/qt_stm32_control.pro \
 
 flash:
 	$(MAKE) -C firmware flash
+
+run: all
+	$(MAKE) flash
+	powershell.exe -NoProfile -Command "Start-Process -FilePath '$(CURDIR)/qt-control/build/release/qt_stm32_control.exe'"
 
 clean:
 	$(MAKE) -C firmware clean

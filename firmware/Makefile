@@ -2,7 +2,7 @@ PROJECT       := qt_stm32_control
 BUILD_DIR     := build
 
 TOOL_DIR      ?= C:/arm-gnu-toolchain-15.2.rel1-mingw-w64-i686-arm-none-eabi
-CUBE_DIR      ?= C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin
+CUBE_DIR      ?= C:/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin
 CROSS_COMPILE ?= $(TOOL_DIR)/bin/arm-none-eabi-
 
 CC            := "$(CROSS_COMPILE)gcc"
@@ -20,7 +20,7 @@ LDFLAGS       := $(CPU_FLAGS) --specs=nano.specs --specs=nosys.specs \
                  -nostartfiles -Wl,--gc-sections -Wl,-Map=$(BUILD_DIR)/$(PROJECT).map \
                  -Wl,--cref -T$(LDSCRIPT)
 
-C_SOURCES     := main.c clock.c system_stm32f4xx.c exception.c uart.c protocol.c led.c motor.c
+C_SOURCES     := main.c clock.c system_stm32f4xx.c exception.c uart.c led.c motor.c
 ASM_SOURCES   := crt0.s
 OBJECTS       := $(addprefix $(BUILD_DIR)/,$(C_SOURCES:.c=.o)) \
                  $(addprefix $(BUILD_DIR)/,$(ASM_SOURCES:.s=.o))

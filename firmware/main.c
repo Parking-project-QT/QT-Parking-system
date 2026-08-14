@@ -1,8 +1,10 @@
 #include "device.h"
 #include "led.h"
 #include "motor.h"
-#include "protocol.h"
+
 #include "uart.h"
+
+#define USART_TEST_LINE_SIZE 64U
 
 static void System_Init(void)
 {
@@ -11,20 +13,45 @@ static void System_Init(void)
     Clock_Init();
     Led_Init();
     Motor_Init();
-    Uart1_Init(115200U);
+    Uart2_Init(115200U);
 }
 
 void Main(void)
 {
+    char line[USART_TEST_LINE_SIZE];
+    unsigned int length = 0U;
+
     System_Init();
-    Uart1_WriteLine("READY STM32F411");
+    Uart2_WriteLine("USART2 TEST READY");
+    Uart2_WriteLine("TYPE A LINE AND PRESS ENTER");
 
     for (;;)
     {
         unsigned char byte;
 
-        while (Uart1_ReadByte(&byte))
+        while (Uart2_ReadByte(&byte))
         {
+            if (byte == '\r')
+            {
+                continue;
+            }
+
+            if (byte == '\n')
+            {
+                line[length] = '\0';
+                Uart2_Write("ECHO: ");
+                Uart2_WriteLine(line);
+                length = 0U;
+            }
+            else if (length < (USART_TEST_LINE_SIZE - 1U))
+            {
+                line[length++] = (char)byte;
+            }
+            else
+            {
+                length = 0U;
+                Uart2_WriteLine("ERROR: LINE TOO LONG");
+            }
 
         }
     }

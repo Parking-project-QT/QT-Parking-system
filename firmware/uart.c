@@ -8,16 +8,16 @@ static volatile unsigned char rx_buffer[UART_RX_BUFFER_SIZE];
 static volatile unsigned int rx_head;
 static volatile unsigned int rx_tail;
 
-static void Uart1_WriteByte(unsigned char byte)
+static void Uart2_WriteByte(unsigned char byte)
 {
-    while (!Macro_Check_Bit_Set(USART1->SR, 7))
+    while (!Macro_Check_Bit_Set(USART2->SR, 7))
     {
     }
 
-    USART1->DR = byte;
+    USART2->DR = byte;
 }
 
-void Uart1_Init(unsigned int baud)
+void Uart2_Init(unsigned int baud)
 {
     unsigned int brr;
 
@@ -25,29 +25,29 @@ void Uart1_Init(unsigned int baud)
     rx_tail = 0U;
 
     Macro_Set_Bit(RCC->AHB1ENR, 0);  /* GPIOA clock */
-    Macro_Set_Bit(RCC->APB2ENR, 4);  /* USART1 clock */
+    Macro_Set_Bit(RCC->APB1ENR, 17); /* USART2 clock */
 
-    /* PA9=USART1_TX, PA10=USART1_RX, alternate function 7. */
-    Macro_Write_Block(GPIOA->MODER, 0xFU, 0xAU, 18);
-    Macro_Write_Block(GPIOA->AFR[1], 0xFFU, 0x77U, 4);
-    Macro_Write_Block(GPIOA->PUPDR, 0xFU, 0x5U, 18);
-    Macro_Write_Block(GPIOA->OSPEEDR, 0xFU, 0xAU, 18);
+    /* PA2=USART2_TX, PA3=USART2_RX, alternate function 7. */
+    Macro_Write_Block(GPIOA->MODER, 0xFU, 0xAU, 4);
+    Macro_Write_Block(GPIOA->AFR[0], 0xFFU, 0x77U, 8);
+    Macro_Write_Block(GPIOA->PUPDR, 0xFU, 0x5U, 4);
+    Macro_Write_Block(GPIOA->OSPEEDR, 0xFU, 0xAU, 4);
 
     /* With OVER8=0 the encoded BRR value is PCLK2 / baud. */
-    brr = (PCLK2 + (baud / 2U)) / baud;
-    USART1->BRR = brr;
-    USART1->CR2 = 0U;
-    USART1->CR3 = 0U;
-    USART1->CR1 = (1U << 13) | /* USART enable */
+    brr = (PCLK1 + (baud / 2U)) / baud;
+    USART2->BRR = brr;
+    USART2->CR2 = 0U;
+    USART2->CR3 = 0U;
+    USART2->CR1 = (1U << 13) | /* USART enable */
                   (1U << 5)  | /* RX-not-empty interrupt */
                   (1U << 3)  | /* transmitter enable */
                   (1U << 2);   /* receiver enable */
 
-    NVIC_ClearPendingIRQ(USART1_IRQn);
-    NVIC_EnableIRQ(USART1_IRQn);
+    NVIC_ClearPendingIRQ(USART2_IRQn);
+    NVIC_EnableIRQ(USART2_IRQn);
 }
 
-int Uart1_ReadByte(unsigned char *byte)
+int Uart2_ReadByte(unsigned char *byte)
 {
     unsigned int tail = rx_tail;
 
@@ -61,22 +61,22 @@ int Uart1_ReadByte(unsigned char *byte)
     return 1;
 }
 
-void Uart1_Write(const char *text)
+void Uart2_Write(const char *text)
 {
     while (*text != '\0')
     {
-        Uart1_WriteByte((unsigned char)*text++);
+        Uart2_WriteByte((unsigned char)*text++);
     }
 }
 
-void Uart1_WriteLine(const char *text)
+void Uart2_WriteLine(const char *text)
 {
-    Uart1_Write(text);
-    Uart1_WriteByte('\r');
-    Uart1_WriteByte('\n');
+    Uart2_Write(text);
+    Uart2_WriteByte('\r');
+    Uart2_WriteByte('\n');
 }
 
-void Uart1_WriteUnsigned(unsigned int value)
+void Uart2_WriteUnsigned(unsigned int value)
 {
     char digits[10];
     unsigned int count = 0U;
@@ -90,17 +90,17 @@ void Uart1_WriteUnsigned(unsigned int value)
 
     while (count != 0U)
     {
-        Uart1_WriteByte((unsigned char)digits[--count]);
+        Uart2_WriteByte((unsigned char)digits[--count]);
     }
 }
 
-void USART1_IRQHandler(void)
+void USART2_IRQHandler(void)
 {
-    unsigned int status = USART1->SR;
+    unsigned int status = USART2->SR;
 
     if ((status & ((1U << 5) | (1U << 3) | (1U << 2) | (1U << 1))) != 0U)
     {
-        unsigned char byte = (unsigned char)USART1->DR;
+        unsigned char byte = (unsigned char)USART2->DR;
 
         if ((status & (1U << 5)) != 0U)
         {
