@@ -1,5 +1,6 @@
 #include "device.h"
 #include "led.h"
+#include "motor.h"
 #include "protocol.h"
 #include "uart.h"
 
@@ -9,6 +10,7 @@ static void System_Init(void)
     SCB->CPACR |= (0x3UL << 20) | (0x3UL << 22);
     Clock_Init();
     Led_Init();
+    Motor_Init();
     Uart1_Init(115200U);
 }
 

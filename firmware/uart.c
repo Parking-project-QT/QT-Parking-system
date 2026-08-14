@@ -76,6 +76,24 @@ void Uart1_WriteLine(const char *text)
     Uart1_WriteByte('\n');
 }
 
+void Uart1_WriteUnsigned(unsigned int value)
+{
+    char digits[10];
+    unsigned int count = 0U;
+
+    do
+    {
+        digits[count++] = (char)('0' + (value % 10U));
+        value /= 10U;
+    }
+    while (value != 0U);
+
+    while (count != 0U)
+    {
+        Uart1_WriteByte((unsigned char)digits[--count]);
+    }
+}
+
 void USART1_IRQHandler(void)
 {
     unsigned int status = USART1->SR;
@@ -96,4 +114,3 @@ void USART1_IRQHandler(void)
         }
     }
 }
-

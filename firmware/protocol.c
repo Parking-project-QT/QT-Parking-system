@@ -1,5 +1,6 @@
 #include "protocol.h"
 #include "led.h"
+#include "motor.h"
 #include "uart.h"
 
 #include <string.h>
@@ -9,6 +10,41 @@
 static char command_buffer[COMMAND_BUFFER_SIZE];
 static unsigned int command_length;
 static int command_overflow;
+
+static int ParseDuty(const char *text, unsigned int *duty)
+{
+    unsigned int value = 0U;
+    unsigned int digits = 0U;
+
+    while (*text != '\0')
+    {
+        if ((*text < '0') || (*text > '9'))
+        {
+            return 0;
+        }
+
+        value = (value * 10U) + (unsigned int)(*text - '0');
+        ++digits;
+        ++text;
+    }
+
+    if ((digits == 0U) || (value > 100U))
+    {
+        return 0;
+    }
+
+    *duty = value;
+    return 1;
+}
+
+static void SendMotorResponse(const char *direction, unsigned int duty)
+{
+    Uart1_Write("OK MOTOR ");
+    Uart1_Write(direction);
+    Uart1_Write(" ");
+    Uart1_WriteUnsigned(duty);
+    Uart1_WriteLine("");
+}
 
 static void ProcessCommand(char *command)
 {
@@ -45,6 +81,43 @@ static void ProcessCommand(char *command)
     {
         Led_Set(2U, 0);
         Uart1_WriteLine("OK LED 2 OFF");
+    }
+    else if (strcmp(command, "MOTOR STOP") == 0)
+    {
+        Motor_Set(MOTOR_STOP, 0U);
+        Uart1_WriteLine("OK MOTOR STOP");
+    }
+    else if (strncmp(command, "MOTOR CW ", 9U) == 0)
+    {
+        unsigned int duty;
+
+        if (ParseDuty(command + 9, &duty))
+        {
+            Motor_Set(MOTOR_CW, duty);
+            SendMotorResponse("CW", duty);
+        }
+        else
+        {
+            Uart1_WriteLine("ERR MOTOR_DUTY");
+        }
+    }
+    else if (strncmp(command, "MOTOR CCW ", 10U) == 0)
+    {
+        unsigned int duty;
+
+        if (ParseDuty(command + 10, &duty))
+        {
+            Motor_Set(MOTOR_CCW, duty);
+            SendMotorResponse("CCW", duty);
+        }
+        else
+        {
+            Uart1_WriteLine("ERR MOTOR_DUTY");
+        }
+    }
+    else if (strncmp(command, "MOTOR ", 6U) == 0)
+    {
+        Uart1_WriteLine("ERR MOTOR_SYNTAX");
     }
     else if (command[0] != '\0')
     {

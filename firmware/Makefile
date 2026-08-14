@@ -20,7 +20,7 @@ LDFLAGS       := $(CPU_FLAGS) --specs=nano.specs --specs=nosys.specs \
                  -nostartfiles -Wl,--gc-sections -Wl,-Map=$(BUILD_DIR)/$(PROJECT).map \
                  -Wl,--cref -T$(LDSCRIPT)
 
-C_SOURCES     := main.c clock.c system_stm32f4xx.c exception.c uart.c protocol.c led.c
+C_SOURCES     := main.c clock.c system_stm32f4xx.c exception.c uart.c protocol.c led.c motor.c
 ASM_SOURCES   := crt0.s
 OBJECTS       := $(addprefix $(BUILD_DIR)/,$(C_SOURCES:.c=.o)) \
                  $(addprefix $(BUILD_DIR)/,$(ASM_SOURCES:.s=.o))
