@@ -1,4 +1,5 @@
 #include "protocol.h"
+#include "led.h"
 #include "uart.h"
 
 #include <string.h>
@@ -24,6 +25,26 @@ static void ProcessCommand(char *command)
     if (strcmp(command, "PING") == 0)
     {
         Uart1_WriteLine("OK PONG");
+    }
+    else if (strcmp(command, "LED 1 ON") == 0)
+    {
+        Led_Set(1U, 1);
+        Uart1_WriteLine("OK LED 1 ON");
+    }
+    else if (strcmp(command, "LED 1 OFF") == 0)
+    {
+        Led_Set(1U, 0);
+        Uart1_WriteLine("OK LED 1 OFF");
+    }
+    else if (strcmp(command, "LED 2 ON") == 0)
+    {
+        Led_Set(2U, 1);
+        Uart1_WriteLine("OK LED 2 ON");
+    }
+    else if (strcmp(command, "LED 2 OFF") == 0)
+    {
+        Led_Set(2U, 0);
+        Uart1_WriteLine("OK LED 2 OFF");
     }
     else if (command[0] != '\0')
     {
@@ -70,4 +91,3 @@ void Protocol_ReceiveByte(unsigned char byte)
         command_overflow = 1;
     }
 }
-
