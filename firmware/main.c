@@ -1,8 +1,4 @@
 #include "device.h"
-#include "led.h"
-#include "motor.h"
-
-#include "uart.h"
 
 #define USART_TEST_LINE_SIZE 64U
 
