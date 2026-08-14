@@ -17,7 +17,6 @@ static void System_Init(void)
 void Main(void)
 {
     System_Init();
-    Protocol_Init();
     Uart1_WriteLine("READY STM32F411");
 
     for (;;)
@@ -26,8 +25,7 @@ void Main(void)
 
         while (Uart1_ReadByte(&byte))
         {
-            Protocol_ReceiveByte(byte);
-        }
 
+        }
     }
 }
