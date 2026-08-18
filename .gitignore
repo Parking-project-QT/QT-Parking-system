@@ -13,3 +13,6 @@ qt-control/debug/
 qt-control/release/
 qt-control/*.pro.user*
 
+# Runtime data
+parking.db
+

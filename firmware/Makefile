@@ -6,7 +6,7 @@ TOOL_DIR      ?= C:/arm-gnu-toolchain-15.2.rel1-mingw-w64-i686-arm-none-eabi
 # STM32CubeProgrammer install directory. The installer offers two locations;
 # override on the command line if yours differs, e.g.
 #   make flash CUBE_DIR="C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin"
-CUBE_DIR      ?= C:/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin
+CUBE_DIR      ?= C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin
 CROSS_COMPILE ?= $(TOOL_DIR)/bin/arm-none-eabi-
 PROGRAMMER    ?= $(CUBE_DIR)/STM32_Programmer_CLI.exe
 
