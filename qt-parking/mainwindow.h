@@ -25,12 +25,6 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
-protected:
-    /* Escape is a panic button: while any dialog is open it already means
-     * "cancel" (QDialog's default), and here on the main window itself it
-     * kills the motor immediately without needing the mouse. */
-    void keyPressEvent(QKeyEvent *event) override;
-
 private:
     /* --- serial port --- */
     void refreshPorts();

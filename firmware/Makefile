@@ -25,7 +25,7 @@ LDFLAGS       := $(CPU_FLAGS) --specs=nano.specs --specs=nosys.specs \
                  -nostartfiles -Wl,--gc-sections -Wl,-Map=$(BUILD_DIR)/$(PROJECT).map \
                  -Wl,--cref -T$(LDSCRIPT)
 
-C_SOURCES     := main.c clock.c system_stm32f4xx.c exception.c \
+C_SOURCES     := main.c device.c clock.c system_stm32f4xx.c exception.c \
                  UART2_Controller.c LED_Controller.c Motor_Controller.c \
                  US_Controller.c Timebase.c Handler.c state_manager.c protocol.c
 ASM_SOURCES   := crt0.s

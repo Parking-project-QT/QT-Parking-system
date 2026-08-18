@@ -5,7 +5,6 @@
 #include <QElapsedTimer>
 #include <QEventLoop>
 #include <QInputDialog>
-#include <QKeyEvent>
 #include <QLocale>
 #include <QMessageBox>
 #include <QPixmap>
@@ -117,19 +116,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::keyPressEvent(QKeyEvent *event)
-{
-    /* Modal dialogs swallow input while open, so this only fires on the main
-     * screen and cannot fight a dialog's own Escape-to-cancel. */
-    if (event->key() == Qt::Key_Escape) {
-        send(QStringLiteral("MOTOR STOP"));
-        statusBar()->showMessage(tr("비상 정지: MOTOR STOP 전송"), 3000);
-        return;
-    }
-
-    QMainWindow::keyPressEvent(event);
-}
-
 /* ------------------------------------------------------------------ */
 /* Serial port                                                         */
 /* ------------------------------------------------------------------ */
@@ -174,10 +160,7 @@ void MainWindow::toggleConnection()
         return;
     }
 
-    if (m_serial->connectPort(port)) {
-        send(QStringLiteral("PING"));
-        send(QStringLiteral("STATE?"));
-    }
+    m_serial->connectPort(port);
 }
 
 void MainWindow::onConnectedChanged(bool connected, const QString &portName)
