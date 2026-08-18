@@ -1,54 +1,34 @@
 #include "device.h"
 
-#define USART_TEST_LINE_SIZE 64U
-
 static void System_Init(void)
 {
-    /* Enable the Cortex-M4 floating-point unit before using hard-float code. */
+    /* 하드 플로트 코드를 쓰기 전에 Cortex-M4 FPU를 활성화한다. */
     SCB->CPACR |= (0x3UL << 20) | (0x3UL << 22);
+
     Clock_Init();
-    Led_Init();
+    Timebase_Init();
+
+    LED_Init();
     Motor_Init();
-    Uart2_Init(115200U);
+    US_Init();
+    UART2_Init(115200U);
+
+    Protocol_Init();
+    State_Init();
 }
 
 void Main(void)
 {
-    char line[USART_TEST_LINE_SIZE];
-    unsigned int length = 0U;
-
     System_Init();
-    Uart2_WriteLine("USART2 TEST READY");
-    Uart2_WriteLine("TYPE A LINE AND PRESS ENTER");
+    UART2_TXLine("READY PARKING");
+    Protocol_SendState();
 
     for (;;)
     {
-        unsigned char byte;
-
-        while (Uart2_ReadByte(&byte))
-        {
-            if (byte == '\r')
-            {
-                continue;
-            }
-
-            if (byte == '\n')
-            {
-                line[length] = '\0';
-                Uart2_Write("ECHO: ");
-                Uart2_WriteLine(line);
-                length = 0U;
-            }
-            else if (length < (USART_TEST_LINE_SIZE - 1U))
-            {
-                line[length++] = (char)byte;
-            }
-            else
-            {
-                length = 0U;
-                Uart2_WriteLine("ERROR: LINE TOO LONG");
-            }
-
-        }
+        UART2_Handler();     /* 호스트 명령 처리 */
+        US_Handler();        /* 거리 측정 및 감지 */
+        Motor_Handler();     /* 차단기 시퀀스 */
+        State_Manager_Run(); /* 상태 -> 컨트롤러 */
+        LED_Handler();       /* 상태 -> LED */
     }
 }

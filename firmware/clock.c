@@ -6,7 +6,7 @@ void Clock_Init(void)
     RCC->CR |= (1 << 0); 
     while(!Macro_Check_Bit_Set(RCC->CR, 1));
 
-    FLASH->ACR = (1<<12)|(1<<11);
+    /* Data cache, instruction cache, prefetch, and 3 flash wait states. */
     FLASH->ACR = (1<<10)|(1<<9)|(1<<8)|(0x3 << 0);
 
     RCC->PLLCFGR = (8<<24)|(0<<22)|(1<<16)|(192<<6)|(8<<0);

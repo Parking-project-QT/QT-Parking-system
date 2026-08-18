@@ -2,7 +2,11 @@ PROJECT       := qt_stm32_control
 BUILD_DIR     := build
 
 TOOL_DIR      ?= C:/arm-gnu-toolchain-15.2.rel1-mingw-w64-i686-arm-none-eabi
-CUBE_DIR      ?= C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin
+
+# STM32CubeProgrammer install directory. The installer offers two locations;
+# override on the command line if yours differs, e.g.
+#   make flash CUBE_DIR="C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin"
+CUBE_DIR      ?= C:/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin
 CROSS_COMPILE ?= $(TOOL_DIR)/bin/arm-none-eabi-
 PROGRAMMER    ?= $(CUBE_DIR)/STM32_Programmer_CLI.exe
 
@@ -21,7 +25,9 @@ LDFLAGS       := $(CPU_FLAGS) --specs=nano.specs --specs=nosys.specs \
                  -nostartfiles -Wl,--gc-sections -Wl,-Map=$(BUILD_DIR)/$(PROJECT).map \
                  -Wl,--cref -T$(LDSCRIPT)
 
-C_SOURCES     := main.c clock.c system_stm32f4xx.c exception.c uart.c led.c motor.c
+C_SOURCES     := main.c clock.c system_stm32f4xx.c exception.c \
+                 UART2_Controller.c LED_Controller.c Motor_Controller.c \
+                 US_Controller.c Timebase.c Handler.c state_manager.c protocol.c
 ASM_SOURCES   := crt0.s
 OBJECTS       := $(addprefix $(BUILD_DIR)/,$(C_SOURCES:.c=.o)) \
                  $(addprefix $(BUILD_DIR)/,$(ASM_SOURCES:.s=.o))
