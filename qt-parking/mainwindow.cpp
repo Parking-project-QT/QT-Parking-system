@@ -121,7 +121,7 @@ MainWindow::MainWindow(QWidget *parent)
     if (m_dbReady) {
         statusBar()->showMessage(
             tr("포트를 선택하고 연결하세요. "
-               "연결 없이도 [TEST] 버튼으로 흐름을 확인할 수 있습니다."));
+               "연결 없이도 차량 감지 버튼으로 흐름을 확인할 수 있습니다."));
     }
 }
 
@@ -317,7 +317,7 @@ void MainWindow::startRecognition()
                         QMessageBox::warning(
                             &dialog, tr("차량 인식"),
                             tr("번호판을 인식하지 못했습니다.\n"
-                               "다시 시도하거나 TEST 버튼을 사용하세요."));
+                               "다시 시도하거나 수동 입·출차 버튼을 사용하세요."));
                         return;
                     }
 
@@ -398,7 +398,7 @@ void MainWindow::showEntryDialog(const QImage &capture, const QString &plate)
         return;
     }
 
-    if (!m_dbReady || !m_carDb.car_in(plate)) {
+    if (!m_dbReady || !m_carDb.car_in(plate, entryTime)) {
         QMessageBox::warning(this, tr("DB 오류"),
                              tr("입차 정보를 저장하지 못했습니다."));
         cancelRecognition();
@@ -426,7 +426,7 @@ void MainWindow::showExitDialog(const QString &plate)
         QMessageBox::information(this, tr("출차 불가"),
                                  plate.isEmpty()
                                      ? tr("주차 중인 차량이 없습니다.\n"
-                                          "먼저 [TEST] 입차로 차량을 등록하세요.")
+                                          "먼저 수동 입차로 차량을 등록하세요.")
                                      : tr("DB에는 주차 중이지만 현재 기록을 불러오지 "
                                           "못했습니다.\n\n차량 번호: %1")
                                            .arg(plate));
@@ -470,7 +470,7 @@ void MainWindow::completeExit(const ParkingRecord &record,
                               const QDateTime &exitTime, int fee,
                               const QString &logLabel)
 {
-    if (!m_dbReady || !m_carDb.car_out(record.plate)) {
+    if (!m_dbReady || !m_carDb.car_out(record.plate, exitTime)) {
         QMessageBox::warning(this, tr("DB 오류"),
                              tr("출차 정보를 저장하지 못했습니다."));
         cancelRecognition();
@@ -659,7 +659,7 @@ void MainWindow::onVehicleListClicked()
     m_modalTaskActive = true;
     const auto releaseBusy = qScopeGuard([this]() { m_modalTaskActive = false; });
 
-    VehicleListDialog dialog(this);
+    VehicleListDialog dialog(m_dbReady ? &m_carDb : nullptr, this);
     dialog.setRecords(m_store.openRecords(), m_store.capacity());
     dialog.exec();
 }

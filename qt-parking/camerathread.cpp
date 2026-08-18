@@ -220,7 +220,7 @@ int CameraThread::init_ai()
     try {
         const QString modelPath = QDir::cleanPath(
             QCoreApplication::applicationDirPath()
-            + QStringLiteral("/../../../chg_qt_file/mnist_model.onnx"));
+            + QStringLiteral("/../../model/mnist_model.onnx"));
         qDebug() << "ONNX Model Path:" << modelPath;
 
         if (!QFileInfo::exists(modelPath)) {
