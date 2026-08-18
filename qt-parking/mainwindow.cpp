@@ -318,6 +318,7 @@ void MainWindow::startRecognition()
                             &dialog, tr("차량 인식"),
                             tr("번호판을 인식하지 못했습니다.\n"
                                "다시 시도하거나 수동 입·출차 버튼을 사용하세요."));
+                        dialog.done(QDialog::Rejected);
                         return;
                     }
 
