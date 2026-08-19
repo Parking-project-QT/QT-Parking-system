@@ -16,3 +16,7 @@ qt-control/*.pro.user*
 # Runtime data
 parking.db
 
+# Windows deployment artifacts
+dist/payload/
+dist/installer-input/
+

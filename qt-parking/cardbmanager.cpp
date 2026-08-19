@@ -1,6 +1,8 @@
 #include "cardbmanager.h"
 
+#include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
 #include <QSqlError>
 #include <QSqlQuery>
 
@@ -22,7 +24,9 @@ bool CarDBManager::connectDB()
 {
     m_db = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"));
     // The database path will be replaced with the deployment path later.
-    m_db.setDatabaseName(QStringLiteral("parking.db"));
+    m_db.setDatabaseName(QDir::cleanPath(
+        QCoreApplication::applicationDirPath()
+        + QStringLiteral("/../../../parking.db")));
 
     if (!m_db.open()) {
         qWarning() << "DB 연결 실패:" << m_db.lastError().text();
